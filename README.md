@@ -249,7 +249,7 @@ A API do backend fornece os seguintes endpoints. Todos os endpoints de `/tasks` 
     * `DELETE /tasks/:id`: Remove uma tarefa do usuário autenticado.
         * Resposta de Sucesso (204): Sem conteúdo no corpo da resposta.
 
-#### Mínimo para rodar
+# Mínimo para rodar
 # To-Do List - Instruções Rápidas de Execução
 
 ## 1. Criar os arquivos `.env`
