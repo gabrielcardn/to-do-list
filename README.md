@@ -80,7 +80,7 @@ Crie arquivos .env para o backend e para o frontend baseados nos exemplos abaixo
 Navegue até a pasta backend e crie um arquivo .env com o seguinte conteúdo.
 ⚠️ Importante: Substitua os valores de placeholder (especialmente DB_PASSWORD e JWT_SECRET) por valores seguros e adequados ao seu ambiente
 
-# backend/.env
+backend/.env
 
 # Configurações do Banco de Dados
 DB_TYPE=mssql
@@ -96,7 +96,7 @@ JWT_EXPIRATION_TIME=3600s # Tempo de expiração do token (ex: 1 hora = 3600s, 1
 
 #### b. Frontend (frontend/.env)
 
-# meu-projeto-frontend/.env
+frontend/.env
 
 Navegue até a frontend e crie um arquivo .env para especificar a URL base da API do backend:
 
@@ -133,7 +133,7 @@ Nota: Se esta for a primeira vez configurando as migrations em um banco de dados
 
 Navegue até a pasta do frontend:
 
-cd ../meu-projeto-frontend 
+cd ../frontend 
 # (Ou o caminho correto a partir da raiz do projeto)
 npm install
 
@@ -145,7 +145,7 @@ Após completar a configuração e instalação das dependências para o backend
 
 1.  No seu terminal, navegue até a pasta raiz do projeto backend:
     ```bash
-    cd caminho/para/seu-projeto/meu-projeto-backend
+    cd caminho/para/seu-projeto/backend
     ```
 2.  Inicie o servidor de desenvolvimento do NestJS:
     ```bash
@@ -157,7 +157,7 @@ Após completar a configuração e instalação das dependências para o backend
 
 1.  Em um **novo terminal**, navegue até a pasta raiz do projeto frontend:
     ```bash
-    cd caminho/para/seu-projeto/meu-projeto-frontend
+    cd caminho/para/seu-projeto/frontend
     ```
 2.  Inicie o servidor de desenvolvimento do Vite para a aplicação React:
     ```bash
@@ -175,7 +175,7 @@ O projeto inclui testes unitários para garantir a qualidade e o correto funcion
 
 1.  Navegue até a pasta raiz do projeto backend:
     ```bash
-    cd caminho/para/seu-projeto/meu-projeto-backend
+    cd caminho/para/seu-projeto/backend
     ```
 2.  Execute os seguintes comandos para os testes:
     * Para rodar todos os testes unitários uma vez:
@@ -199,7 +199,7 @@ O projeto inclui testes unitários para garantir a qualidade e o correto funcion
 
 1.  Navegue até a pasta raiz do projeto frontend:
     ```bash
-    cd caminho/para/seu-projeto/meu-projeto-frontend
+    cd caminho/para/seu-projeto/frontend
     ```
 2.  Execute os seguintes comandos para os testes:
     * Para rodar todos os testes unitários uma vez no terminal:
