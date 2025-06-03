@@ -93,8 +93,10 @@ DB_DATABASE=todolist_db
 ```
 
 # Configurações do JWT
+```env
 JWT_SECRET=!!!SuaChaveSuperSecretaMuitoForteAquiPeloMenos32Caracteres!!! # !!! GERE UM SEGREDO FORTE E ÚNICO !!!
 JWT_EXPIRATION_TIME=3600s # Tempo de expiração do token (ex: 1 hora = 3600s, 1 dia = 1d)
+```
 
 #### b. Frontend (frontend/.env)
 
