@@ -1,0 +1,17 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql_server_todolist_dev
+    environment:
+      SA_PASSWORD: "MinhaSenha123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data_dev:/var/opt/mssql
+      - ./init-db.sh:/init-db.sh   # monta o script no container
+    command: [ "/bin/bash", "/init-db.sh" ]
+
+volumes:
+  sqlserver_data_dev:
