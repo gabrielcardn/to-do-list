@@ -83,7 +83,7 @@ Navegue até a pasta backend e crie um arquivo .env com o seguinte conteúdo.
 backend/.env
 
 # Configurações do Banco de Dados
-```env
+```
 DB_TYPE=mssql
 DB_HOST=localhost
 DB_PORT=1433 # Ou a porta que você configurou para o SQL Server no docker-compose.yml (ex: 1433 se for a padrão)
@@ -93,7 +93,7 @@ DB_DATABASE=todolist_db
 ```
 
 # Configurações do JWT
-```env
+```
 JWT_SECRET=!!!SuaChaveSuperSecretaMuitoForteAquiPeloMenos32Caracteres!!! # !!! GERE UM SEGREDO FORTE E ÚNICO !!!
 JWT_EXPIRATION_TIME=3600s # Tempo de expiração do token (ex: 1 hora = 3600s, 1 dia = 1d)
 ```
@@ -112,8 +112,9 @@ VITE_API_BASE_URL=http://localhost:3000
 O banco de dados SQL Server é gerenciado pelo Docker Compose para facilitar a configuração e portabilidade.
 
 Navegue até a pasta do backend:
-
+```
 cd backend
+```
 
 Verifique o docker-compose.yml: Confirme se a variável SA_PASSWORD dentro da seção environment do serviço sqlserver no arquivo docker-compose.yml corresponde à DB_PASSWORD que você definiu no arquivo .env do backend.
 
@@ -128,11 +129,14 @@ Aguarde alguns instantes para o SQL Server inicializar completamente. Você pode
 
 Ainda na pasta backend:
 
+```
 npm install
+```
 
 Após a instalação das dependências e com o banco de dados Docker rodando, aplique as migrations para criar as tabelas (users, tasks, typeorm_migrations):
-
+```
 npm run migration:run
+```
 
 Nota: Se esta for a primeira vez configurando as migrations em um banco de dados completamente limpo (e você já tem a configuração data-source.ts e a pasta src/migrations com uma migration inicial, como a InitialSchema), este comando criará a estrutura das tabelas. Se você não gerou uma migration inicial ainda, você precisaria executar npm run migration:generate src/migrations/[NomeDaSuaMigrationInicial] antes.
 
@@ -140,9 +144,9 @@ Nota: Se esta for a primeira vez configurando as migrations em um banco de dados
 
 Navegue até a pasta do frontend:
 
-cd ../frontend 
-# (Ou o caminho correto a partir da raiz do projeto)
+```
 npm install
+```
 
 ## Como Executar o Projeto
 
@@ -151,11 +155,11 @@ Após completar a configuração e instalação das dependências para o backend
 ### 1. Executar o Backend (NestJS)
 
 1.  No seu terminal, navegue até a pasta raiz do projeto backend:
-    ```bash
+    ```
     cd caminho/para/seu-projeto/backend
     ```
 2.  Inicie o servidor de desenvolvimento do NestJS:
-    ```bash
+    ```
     npm run start:dev
     ```
     O servidor backend iniciará e estará escutando na porta configurada (geralmente `http://localhost:3000`, conforme definido no `src/main.ts` do backend). Você verá logs no terminal indicando que a aplicação NestJS foi iniciada.
@@ -163,15 +167,11 @@ Após completar a configuração e instalação das dependências para o backend
 ### 2. Executar o Frontend (React)
 
 1.  Em um **novo terminal**, navegue até a pasta raiz do projeto frontend:
-    ```bash
-    cd caminho/para/seu-projeto/frontend
-    ```
 2.  Inicie o servidor de desenvolvimento do Vite para a aplicação React:
-    ```bash
+    ```
     npm run dev
     ```
     A aplicação React será compilada e servida. O terminal indicará o endereço para acessá-la no navegador (geralmente `http://localhost:5173` ou outra porta similar).
-
 3.  Abra o endereço do frontend fornecido no seu navegador para interagir com a aplicação.
 
 ## Executando os Testes
@@ -181,44 +181,41 @@ O projeto inclui testes unitários para garantir a qualidade e o correto funcion
 ### Testes Unitários do Backend (NestJS com Jest)
 
 1.  Navegue até a pasta raiz do projeto backend:
-    ```bash
-    cd caminho/para/seu-projeto/backend
-    ```
 2.  Execute os seguintes comandos para os testes:
     * Para rodar todos os testes unitários uma vez:
-      ```bash
+      ```
       npm run test
       ```
     * Para rodar os testes em modo de observação (watch mode), que re-executa os testes automaticamente ao detectar alterações nos arquivos:
-      ```bash
+      ```
       npm run test:watch
       ```
     * Para rodar os testes e gerar um relatório de cobertura de código:
-      ```bash
+      ```
       npm run test:cov
       ```
     * Para rodar um arquivo de teste específico (substitua pelo caminho do arquivo):
-      ```bash
+      ```
       npm run test -- src/auth/auth.service.spec.ts
       ```
 
 ### Testes Unitários do Frontend (React com Vitest)
 
 1.  Navegue até a pasta raiz do projeto frontend:
-    ```bash
+    ```
     cd caminho/para/seu-projeto/frontend
     ```
 2.  Execute os seguintes comandos para os testes:
     * Para rodar todos os testes unitários uma vez no terminal:
-      ```bash
+      ```
       npm run test
       ```
     * Para abrir a interface gráfica do Vitest no navegador, que permite uma execução e visualização interativa dos testes:
-      ```bash
+      ```
       npm run test:ui
       ```
     * Para rodar um arquivo de teste específico (substitua pelo caminho do arquivo):
-      ```bash
+      ```
       npm run test -- src/pages/LoginPage.test.tsx
       ```
 
