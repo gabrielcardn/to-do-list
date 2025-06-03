@@ -248,6 +248,7 @@ A API do backend fornece os seguintes endpoints. Todos os endpoints de `/tasks` 
         * Resposta de Sucesso (200): Retorna o objeto da tarefa atualizada.
     * `DELETE /tasks/:id`: Remove uma tarefa do usuário autenticado.
         * Resposta de Sucesso (204): Sem conteúdo no corpo da resposta.
+---
 
 # Mínimo para rodar
 # To-Do List - Instruções Rápidas de Execução
