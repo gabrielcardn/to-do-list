@@ -76,7 +76,7 @@ git clone github.com/gabrielcardn/to-do-list/
 
 Crie arquivos .env para o backend e para o frontend baseados nos exemplos abaixo. Estes arquivos são cruciais para configurar a conexão com o banco de dados, segredos de JWT, e outras informações específicas do ambiente.
 
-*** a. Backend (backend/.env) ***
+#### a. Backend (backend/.env)
 Navegue até a pasta backend e crie um arquivo .env com o seguinte conteúdo.
 ⚠️ Importante: Substitua os valores de placeholder (especialmente DB_PASSWORD e JWT_SECRET) por valores seguros e adequados ao seu ambiente
 
@@ -94,7 +94,7 @@ DB_DATABASE=todolist_db
 JWT_SECRET=!!!SuaChaveSuperSecretaMuitoForteAquiPeloMenos32Caracteres!!! # !!! GERE UM SEGREDO FORTE E ÚNICO !!!
 JWT_EXPIRATION_TIME=3600s # Tempo de expiração do token (ex: 1 hora = 3600s, 1 dia = 1d)
 
-*** b. Frontend (frontend/.env) ***
+#### b. Frontend (frontend/.env)
 
 # meu-projeto-frontend/.env
 
