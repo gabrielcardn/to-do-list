@@ -8,6 +8,8 @@ import {
   type UserProfile,
 } from "./authService";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+
 describe("authService", () => {
   beforeEach(() => {
     const fetchMockFunc = vi.fn(); // Use um nome diferente para a função mock criada
@@ -34,7 +36,7 @@ describe("authService", () => {
       const result = await loginUser(mockCredentials);
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith("http://localhost:3000/auth/login", {
+      expect(fetch).toHaveBeenCalledWith(API_BASE_URL + "/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mockCredentials),
@@ -94,7 +96,7 @@ describe("authService", () => {
 
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(fetch).toHaveBeenCalledWith(
-        "http://localhost:3000/auth/register", // Endpoint de registro
+        API_BASE_URL + "localhost:3000/auth/register", // Endpoint de registro
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

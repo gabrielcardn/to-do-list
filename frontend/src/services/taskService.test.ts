@@ -11,7 +11,7 @@ import {
 } from './taskService'; // Ajuste o caminho se necessário
 
 // Mock da API_BASE_URL (se não for exportada de taskService, defina aqui igual)
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 describe('taskService', () => {
   const mockToken = 'mock-access-token';

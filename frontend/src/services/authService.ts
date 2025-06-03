@@ -2,7 +2,7 @@
 
 // URL base da sua API backend
 // Certifique-se de que seu backend NestJS esteja rodando nesta URL e porta
-const API_BASE_URL = "http://localhost:3000"; // A porta padrão do NestJS
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 export interface LoginResponse {
   access_token: string;

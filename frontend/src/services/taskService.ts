@@ -1,6 +1,6 @@
 // src/services/taskService.ts
 
-const API_BASE_URL = 'http://localhost:3000'; // A porta padrão do NestJS
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 // Tipos relacionados a Tarefas (movidos de authService ou definidos aqui)
 export interface Task {
