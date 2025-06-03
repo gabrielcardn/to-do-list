@@ -83,12 +83,14 @@ Navegue até a pasta backend e crie um arquivo .env com o seguinte conteúdo.
 backend/.env
 
 # Configurações do Banco de Dados
+```env
 DB_TYPE=mssql
 DB_HOST=localhost
 DB_PORT=1433 # Ou a porta que você configurou para o SQL Server no docker-compose.yml (ex: 1433 se for a padrão)
 DB_USERNAME=sa
 DB_PASSWORD=yourStrong(!)Password123 # !!! SUBSTITUA PELA SUA SENHA FORTE DO USUÁRIO SA DO SQL SERVER !!!
 DB_DATABASE=todolist_db
+```
 
 # Configurações do JWT
 JWT_SECRET=!!!SuaChaveSuperSecretaMuitoForteAquiPeloMenos32Caracteres!!! # !!! GERE UM SEGREDO FORTE E ÚNICO !!!
