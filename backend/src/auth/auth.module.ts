@@ -1,4 +1,3 @@
-// src/auth/auth.module.ts
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -6,12 +5,12 @@ import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from './jwt.strategy'; // <-- Importe a JwtStrategy
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
     UsersModule,
-    PassportModule, // Você pode adicionar .register({ defaultStrategy: 'jwt' }) aqui se JWT for a estratégia padrão global
+    PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -23,7 +22,7 @@ import { JwtStrategy } from './jwt.strategy'; // <-- Importe a JwtStrategy
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy], // <-- Adicione JwtStrategy aqui
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })

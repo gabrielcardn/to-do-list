@@ -1,12 +1,11 @@
-// src/pages/RegistrationPage.tsx
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { registerUser, type CreateUserDto } from '../services/authService'; // Importe as novidades
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { registerUser, type CreateUserDto } from "../services/authService";
 
 function RegistrationPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -16,7 +15,7 @@ function RegistrationPage() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError('As senhas não coincidem!');
+      setError("As senhas não coincidem!");
       return;
     }
 
@@ -25,15 +24,17 @@ function RegistrationPage() {
     const userData: CreateUserDto = { username, password };
 
     try {
-      // Chama a função real de registro da API
       const registeredUser = await registerUser(userData);
-      console.log('Registro bem-sucedido!', registeredUser);
-      alert('Registro bem-sucedido! Você pode fazer login agora.');
-      navigate('/login'); // Redireciona para a página de login após o registro
+      console.log("Registro bem-sucedido!", registeredUser);
+      alert("Registro bem-sucedido! Você pode fazer login agora.");
+      navigate("/login");
     } catch (err: any) {
-      console.error('Falha no registro:', err);
-      // err.message aqui deve vir da throw new Error() no authService
-      setError(err.message || 'Não foi possível registrar. Verifique os dados ou tente outro nome de usuário.');
+      console.error("Falha no registro:", err);
+
+      setError(
+        err.message ||
+          "Não foi possível registrar. Verifique os dados ou tente outro nome de usuário."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -78,9 +79,9 @@ function RegistrationPage() {
           />
         </div>
         <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Registrando...' : 'Registrar'}
+          {isLoading ? "Registrando..." : "Registrar"}
         </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
       <p>
         Já tem uma conta? <Link to="/login">Faça login</Link>

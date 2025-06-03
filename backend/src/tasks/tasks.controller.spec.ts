@@ -1,4 +1,3 @@
-// src/tasks/tasks.controller.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
@@ -10,14 +9,12 @@ import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
-// Mock para UserProfile
 const mockUser: UserProfile = {
   id: 'user-uuid-123',
   username: 'testuser',
   tasks: [],
 };
 
-// Mock para TasksService
 const mockTasksService = {
   createTask: jest.fn(),
   getTasks: jest.fn(),
@@ -37,18 +34,17 @@ describe('TasksController', () => {
       providers: [
         {
           provide: TasksService,
-          useValue: mockTasksService, // Usamos o mock do serviço
+          useValue: mockTasksService,
         },
       ],
     })
-    .overrideGuard(AuthGuard('jwt')) // Mocka o AuthGuard para todos os testes neste controller
-    .useValue({ canActivate: jest.fn(() => true) }) // Faz o AuthGuard sempre permitir o acesso
-    .compile();
+      .overrideGuard(AuthGuard('jwt'))
+      .useValue({ canActivate: jest.fn(() => true) })
+      .compile();
 
     controller = module.get<TasksController>(TasksController);
-    service = module.get<TasksService>(TasksService); // Para acessar os mocks do serviço
+    service = module.get<TasksService>(TasksService);
 
-    // Resetar mocks antes de cada teste
     mockTasksService.createTask.mockReset();
     mockTasksService.getTasks.mockReset();
     mockTasksService.getTaskById.mockReset();
@@ -61,15 +57,17 @@ describe('TasksController', () => {
     expect(controller).toBeDefined();
   });
 
-  // Testes para o endpoint createTask (POST /tasks)
   describe('createTask', () => {
-    const createTaskDto: CreateTaskDto = { title: 'Nova Tarefa Controller', description: 'Desc Controller' };
-    const expectedTask = { 
-      id: 'task-uuid-controller', 
-      ...createTaskDto, 
-      status: TaskStatus.PENDING, 
+    const createTaskDto: CreateTaskDto = {
+      title: 'Nova Tarefa Controller',
+      description: 'Desc Controller',
+    };
+    const expectedTask = {
+      id: 'task-uuid-controller',
+      ...createTaskDto,
+      status: TaskStatus.PENDING,
       userId: mockUser.id,
-      user: null as any, // Adicionado para conformar com Task entity se 'user' for esperado
+      user: null as any,
     } as Task;
 
     it('should call tasksService.createTask and return the created task', async () => {
@@ -82,12 +80,18 @@ describe('TasksController', () => {
     });
   });
 
-  // Testes para o endpoint getTasks (GET /tasks)
   describe('getTasks', () => {
     const paginationDto: PaginationQueryDto = { page: 1, limit: 5 };
     const mockTasksResult = {
       data: [
-         { id: 'task-1', title: 'Tarefa 1', description: 'Desc 1', status: TaskStatus.PENDING, userId: mockUser.id, user: null as any } as Task,
+        {
+          id: 'task-1',
+          title: 'Tarefa 1',
+          description: 'Desc 1',
+          status: TaskStatus.PENDING,
+          userId: mockUser.id,
+          user: null as any,
+        } as Task,
       ],
       total: 1,
       page: 1,
@@ -104,60 +108,82 @@ describe('TasksController', () => {
     });
   });
 
-  // --- Teste para getTaskById (GET /tasks/:id) ---
   describe('getTaskById', () => {
-     const taskId = 'some-task-id';
-     const expectedTask = { id: taskId, title: 'Specific Task', userId: mockUser.id, /* ... other fields */ } as Task;
-     
-     it('should call tasksService.getTaskById and return the task', async () => {
-         mockTasksService.getTaskById.mockResolvedValue(expectedTask);
-         const result = await controller.getTaskById(taskId, mockUser);
-         expect(service.getTaskById).toHaveBeenCalledWith(taskId, mockUser);
-         expect(result).toEqual(expectedTask);
-     });
+    const taskId = 'some-task-id';
+    const expectedTask = {
+      id: taskId,
+      title: 'Specific Task',
+      userId: mockUser.id /* ... other fields */,
+    } as Task;
+
+    it('should call tasksService.getTaskById and return the task', async () => {
+      mockTasksService.getTaskById.mockResolvedValue(expectedTask);
+      const result = await controller.getTaskById(taskId, mockUser);
+      expect(service.getTaskById).toHaveBeenCalledWith(taskId, mockUser);
+      expect(result).toEqual(expectedTask);
+    });
   });
 
-  // --- Teste para updateTaskStatus (PATCH /tasks/:id/status) ---
-   describe('updateTaskStatus', () => {
-     const taskId = 'some-task-id';
-     const updateStatusDto: UpdateTaskStatusDto = { status: TaskStatus.DONE };
-     const expectedTask = { id: taskId, title: 'Task', status: TaskStatus.DONE, userId: mockUser.id, /* ... */ } as Task;
+  describe('updateTaskStatus', () => {
+    const taskId = 'some-task-id';
+    const updateStatusDto: UpdateTaskStatusDto = { status: TaskStatus.DONE };
+    const expectedTask = {
+      id: taskId,
+      title: 'Task',
+      status: TaskStatus.DONE,
+      userId: mockUser.id /* ... */,
+    } as Task;
 
-     it('should call tasksService.updateTaskStatus and return the updated task', async () => {
-         mockTasksService.updateTaskStatus.mockResolvedValue(expectedTask);
-         const result = await controller.updateTaskStatus(taskId, updateStatusDto, mockUser);
-         expect(service.updateTaskStatus).toHaveBeenCalledWith(taskId, updateStatusDto, mockUser);
-         expect(result).toEqual(expectedTask);
-     });
-   });
+    it('should call tasksService.updateTaskStatus and return the updated task', async () => {
+      mockTasksService.updateTaskStatus.mockResolvedValue(expectedTask);
+      const result = await controller.updateTaskStatus(
+        taskId,
+        updateStatusDto,
+        mockUser,
+      );
+      expect(service.updateTaskStatus).toHaveBeenCalledWith(
+        taskId,
+        updateStatusDto,
+        mockUser,
+      );
+      expect(result).toEqual(expectedTask);
+    });
+  });
 
-  // --- Teste para updateTask (PATCH /tasks/:id) ---
-   describe('updateTask', () => {
-     const taskId = 'some-task-id';
-     const updateTaskDto: UpdateTaskDto = { title: 'Updated Title' };
-     const expectedTask = { id: taskId, title: 'Updated Title', userId: mockUser.id, /* ... */ } as Task;
-     
-     it('should call tasksService.updateTask and return the updated task', async () => {
-         mockTasksService.updateTask.mockResolvedValue(expectedTask);
-         const result = await controller.updateTask(taskId, updateTaskDto, mockUser);
-         expect(service.updateTask).toHaveBeenCalledWith(taskId, updateTaskDto, mockUser);
-         expect(result).toEqual(expectedTask);
-     });
-   });
+  describe('updateTask', () => {
+    const taskId = 'some-task-id';
+    const updateTaskDto: UpdateTaskDto = { title: 'Updated Title' };
+    const expectedTask = {
+      id: taskId,
+      title: 'Updated Title',
+      userId: mockUser.id /* ... */,
+    } as Task;
 
-  // --- Teste para deleteTask (DELETE /tasks/:id) ---
-   describe('deleteTask', () => {
-     const taskId = 'some-task-id';
-     
-     it('should call tasksService.deleteTask and return void', async () => {
-         mockTasksService.deleteTask.mockResolvedValue(undefined); // deleteTask retorna void
-         
-         await controller.deleteTask(taskId, mockUser); // Não há 'result' para verificar
-         
-         expect(service.deleteTask).toHaveBeenCalledWith(taskId, mockUser);
-         // Não há expect(result) aqui, pois o método do controller retorna Promise<void>
-         // e o endpoint HTTP retorna 204 No Content.
-     });
-   });
+    it('should call tasksService.updateTask and return the updated task', async () => {
+      mockTasksService.updateTask.mockResolvedValue(expectedTask);
+      const result = await controller.updateTask(
+        taskId,
+        updateTaskDto,
+        mockUser,
+      );
+      expect(service.updateTask).toHaveBeenCalledWith(
+        taskId,
+        updateTaskDto,
+        mockUser,
+      );
+      expect(result).toEqual(expectedTask);
+    });
+  });
 
+  describe('deleteTask', () => {
+    const taskId = 'some-task-id';
+
+    it('should call tasksService.deleteTask and return void', async () => {
+      mockTasksService.deleteTask.mockResolvedValue(undefined);
+
+      await controller.deleteTask(taskId, mockUser);
+
+      expect(service.deleteTask).toHaveBeenCalledWith(taskId, mockUser);
+    });
+  });
 });

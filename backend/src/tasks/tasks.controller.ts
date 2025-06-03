@@ -1,4 +1,3 @@
-// src/tasks/tasks.controller.ts
 import {
   Controller,
   Get,
@@ -6,28 +5,26 @@ import {
   Body,
   Query,
   UseGuards,
-  Req, // Para acessar o objeto request
-  Param, // <-- Importe Param
-  Patch, // <-- Importe Patch
-  ParseUUIDPipe, // <-- Para validar se o ID é um UUID (opcional, mas bom)
-  Delete, // <-- Importe Delete
-  HttpCode, // <-- Importe HttpCode
-  HttpStatus, // <-- Importe HttpStatus
+  Param,
+  Patch,
+  ParseUUIDPipe,
+  Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { AuthGuard } from '@nestjs/passport'; // Importa o AuthGuard
-import { UserProfile } from '../users/users.service'; // Para tipar req.user
+import { AuthGuard } from '@nestjs/passport';
+import { UserProfile } from '../users/users.service';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { Task } from './task.entity';
-import { UpdateTaskStatusDto } from './dto/update-task-status.dto'; // <-- Importe o DTO
-import { UpdateTaskDto } from './dto/update-task.dto'; // <-- Importe o DTO
+import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
-// Decorador customizado para pegar o usuário do request (opcional, mas elegante)
 import { GetUser } from '../auth/decorators/get-user.decorator';
 
 @Controller('tasks')
-@UseGuards(AuthGuard('jwt')) // Protege todos os endpoints neste controller com JWT
+@UseGuards(AuthGuard('jwt'))
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
@@ -39,7 +36,6 @@ export class TasksController {
     return this.tasksService.getTasks(user, paginationQueryDto);
   }
 
-  // Endpoint para buscar uma tarefa específica (usando o getTaskById do serviço)
   @Get('/:id')
   async getTaskById(
     @Param('id', ParseUUIDPipe) id: string,
@@ -51,42 +47,35 @@ export class TasksController {
   @Post()
   async createTask(
     @Body() createTaskDto: CreateTaskDto,
-    @GetUser() user: UserProfile, // Usa o decorador customizado GetUser
+    @GetUser() user: UserProfile,
   ): Promise<Task> {
-    // Alternativamente, sem o decorador GetUser:
-    // @Req() req: any, // Tipagem mais genérica para req
-    // const user = req.user as UserProfile;
     return this.tasksService.createTask(createTaskDto, user);
   }
 
-  // Novo endpoint para atualizar o status da tarefa
-  @Patch('/:id/status') // Ex: PATCH /tasks/algum-uuid/status
+  @Patch('/:id/status')
   async updateTaskStatus(
-    @Param('id', ParseUUIDPipe) id: string, // Pega o 'id' da URL e valida se é um UUID
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTaskStatusDto: UpdateTaskStatusDto,
     @GetUser() user: UserProfile,
   ): Promise<Task> {
     return this.tasksService.updateTaskStatus(id, updateTaskStatusDto, user);
   }
 
-  // Novo endpoint para atualizar os detalhes da tarefa
-  @Patch('/:id') // Ex: PATCH /tasks/algum-uuid
+  @Patch('/:id')
   async updateTask(
-    @Param('id', ParseUUIDPipe) id: string, // Pega o 'id' da URL e valida se é um UUID
-    @Body() updateTaskDto: UpdateTaskDto, // Pega o corpo da requisição com os dados a serem atualizados
-    @GetUser() user: UserProfile, // Obtém o usuário autenticado
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+    @GetUser() user: UserProfile,
   ): Promise<Task> {
     return this.tasksService.updateTask(id, updateTaskDto, user);
   }
 
-  // Novo endpoint para deletar uma tarefa
   @Delete('/:id')
-  @HttpCode(HttpStatus.NO_CONTENT) // Define o status HTTP para 204 No Content em caso de sucesso
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTask(
-    @Param('id', ParseUUIDPipe) id: string, // Pega o 'id' da URL e valida se é um UUID
-    @GetUser() user: UserProfile, // Obtém o usuário autenticado
+    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser() user: UserProfile,
   ): Promise<void> {
-    // O método do controller também não retorna conteúdo
     return this.tasksService.deleteTask(id, user);
   }
 }

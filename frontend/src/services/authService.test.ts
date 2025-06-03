@@ -12,8 +12,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000
 
 describe("authService", () => {
   beforeEach(() => {
-    const fetchMockFunc = vi.fn(); // Use um nome diferente para a função mock criada
-    vi.stubGlobal("fetch", fetchMockFunc); // 'fetch' global agora é fetchMockFunc
+    const fetchMockFunc = vi.fn();
+    vi.stubGlobal("fetch", fetchMockFunc);
     localStorage.clear();
   });
 
@@ -26,7 +26,6 @@ describe("authService", () => {
     const mockLoginResponse: LoginResponse = { access_token: "fake-jwt-token" };
 
     it("should successfully log in a user and return an access token", async () => {
-      // Use o tipo 'Mock' importado para o cast
       (fetch as Mock).mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -65,44 +64,33 @@ describe("authService", () => {
         },
       } as unknown as Response);
 
-      await expect(loginUser(mockCredentials)).rejects.toThrow("Erro ao fazer login"); // LINHA CORRIGIDA
+      await expect(loginUser(mockCredentials)).rejects.toThrow("Erro ao fazer login");
     });
   });
 
-  // Novos Testes para registerUser
   describe("registerUser", () => {
     const mockUserData: CreateUserDto = { username: "newuser", password: "newpassword123" };
-    // A resposta do backend para register é um UserProfile
+
     const mockRegisterResponse: UserProfile = {
       id: "user-uuid-registered",
       username: "newuser",
-      // Se UserProfile no frontend espera 'tasks', adicione tasks: []
-      // Exemplo, se a interface UserProfile em authService.ts for:
-      // export interface UserProfile { id: string; username: string; tasks?: any[]; }
-      // Então não precisa de tasks. Se for como a do User (Omit<User, 'password'>) e User tiver tasks, precisa.
-      // Vamos assumir que a UserProfile em authService.ts é simples por agora:
-      // export interface UserProfile { id: string; username: string; }
-      // Se for mais complexa, ajuste o mockRegisterResponse.
     };
 
     it("should successfully register a user and return user profile", async () => {
       (fetch as Mock).mockResolvedValueOnce({
         ok: true,
-        status: 201, // Registro bem-sucedido geralmente retorna 201 Created
+        status: 201,
         json: async () => mockRegisterResponse,
       } as unknown as Response);
 
       const result = await registerUser(mockUserData);
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(
-        API_BASE_URL + "localhost:3000/auth/register", // Endpoint de registro
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(mockUserData),
-        }
-      );
+      expect(fetch).toHaveBeenCalledWith(API_BASE_URL + "localhost:3000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mockUserData),
+      });
       expect(result).toEqual(mockRegisterResponse);
     });
 
@@ -110,7 +98,7 @@ describe("authService", () => {
       const errorMessage = "Username already exists";
       (fetch as Mock).mockResolvedValueOnce({
         ok: false,
-        status: 409, // Conflict, comum para usuário já existente
+        status: 409,
         json: async () => ({ message: errorMessage }),
       } as unknown as Response);
 
@@ -127,9 +115,6 @@ describe("authService", () => {
         },
       } as unknown as Response);
 
-      // A lógica em registerUser para este caso é:
-      // const errorData = await response.json().catch(() => ({ message: 'Erro ao registrar' }));
-      // throw new Error(message || `Erro HTTP: ${response.status}`);
       await expect(registerUser(mockUserData)).rejects.toThrow("Erro ao registrar");
     });
   });

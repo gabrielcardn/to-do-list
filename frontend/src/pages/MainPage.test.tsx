@@ -1,13 +1,11 @@
-// src/pages/MainPage.test.tsx
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react"; // Adicione 'within'
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import MainPage from "./MainPage";
 import * as taskService from "../services/taskService";
 import type { Task, PaginatedTasksResponse } from "../services/taskService";
 
-// Mock completo para o módulo taskService
 vi.mock("../services/taskService", () => ({
   getTasks: vi.fn(),
   createTask: vi.fn(),
@@ -16,7 +14,6 @@ vi.mock("../services/taskService", () => ({
   deleteTaskById: vi.fn(),
 }));
 
-// Mock para useNavigate
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async (importOriginal) => {
   const actual = await importOriginal<typeof import("react-router-dom")>();
@@ -26,27 +23,22 @@ vi.mock("react-router-dom", async (importOriginal) => {
   };
 });
 
-// Mock para window.confirm
 const mockConfirm = vi.fn();
 vi.stubGlobal("confirm", mockConfirm);
 
-// Objeto para status da tarefa no frontend (copiado de MainPage.tsx para uso nos testes)
 const TaskFrontendStatus = {
   PENDING: "PENDING",
   IN_PROGRESS: "IN_PROGRESS",
   DONE: "DONE",
 } as const;
-// type TaskFrontendStatusValue = typeof TaskFrontendStatus[keyof typeof TaskFrontendStatus]; // Se precisar do tipo
 
-// Constante para tasksPerPage usada no componente MainPage e nos mocks
 const TASKS_PER_PAGE_IN_COMPONENT = 5;
 
-// Dados mockados consistentes com TASKS_PER_PAGE_IN_COMPONENT = 5
 const mockTasksForPage1: Task[] = Array.from({ length: TASKS_PER_PAGE_IN_COMPONENT }, (_, i) => ({
   id: `t${i + 1}`,
   title: `Tarefa ${i + 1} da Página 1`,
   description: `Descrição da Tarefa ${i + 1}`,
-  status: i % 2 === 0 ? TaskFrontendStatus.PENDING : TaskFrontendStatus.DONE, // Alternando status para variedade
+  status: i % 2 === 0 ? TaskFrontendStatus.PENDING : TaskFrontendStatus.DONE,
   userId: "user1",
 }));
 
@@ -60,7 +52,7 @@ const mockTasksForPage2: Task[] = [
   },
 ];
 
-const totalMockTasks = mockTasksForPage1.length + mockTasksForPage2.length; // Total 6 tarefas
+const totalMockTasks = mockTasksForPage1.length + mockTasksForPage2.length;
 
 const mockPaginatedResponsePage1: PaginatedTasksResponse = {
   data: mockTasksForPage1,
@@ -89,7 +81,7 @@ describe("MainPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.setItem("accessToken", "fake-token");
-    (taskService.getTasks as Mock).mockResolvedValue(emptyTasksResponse); // Mock padrão inicial
+    (taskService.getTasks as Mock).mockResolvedValue(emptyTasksResponse);
   });
 
   afterEach(() => {
@@ -119,7 +111,6 @@ describe("MainPage", () => {
   });
 
   it('should display "Nenhuma tarefa encontrada" when no tasks are fetched', async () => {
-    // beforeEach já configura getTasks para emptyTasksResponse
     render(
       <BrowserRouter>
         <MainPage />
@@ -156,63 +147,67 @@ describe("MainPage", () => {
       userId: "user1",
     };
 
- it('should open add task modal, submit, call createTask, close modal, and refresh list', async () => {
-        (taskService.getTasks as Mock)
-          .mockResolvedValueOnce(emptyTasksResponse)
-          .mockResolvedValueOnce({
-            data: [createdTask], 
-            total: 1, 
-            page: 1, 
-            limit: TASKS_PER_PAGE_IN_COMPONENT
-          });
-        (taskService.createTask as Mock).mockResolvedValue(createdTask);
-
-        render(<BrowserRouter><MainPage /></BrowserRouter>);
-        await waitFor(() => expect(screen.getByText(/nenhuma tarefa encontrada/i)).toBeInTheDocument());
-        expect(taskService.getTasks).toHaveBeenCalledTimes(1);
-
-        const addTaskButton = screen.getByRole('button', { name: /adicionar nova tarefa/i });
-        await user.click(addTaskButton);
-        
-        // Verifica se o modal abriu com o título exato "Nova Tarefa"
-        expect(screen.getByRole('heading', { name: /^Nova Tarefa$/i })).toBeInTheDocument();
-
-        await user.type(screen.getByLabelText(/título/i), newTaskTitle); // newTaskTitle é "Nova Tarefa Adicionada Pelo Teste"
-        await user.type(screen.getByLabelText(/descrição/i), newTaskDescription);
-        
-        const saveButton = screen.getByRole('button', { name: /criar tarefa/i });
-        await user.click(saveButton);
-
-        await waitFor(() => {
-            expect(taskService.createTask).toHaveBeenCalledWith({ title: newTaskTitle, description: newTaskDescription });
+    it("should open add task modal, submit, call createTask, close modal, and refresh list", async () => {
+      (taskService.getTasks as Mock)
+        .mockResolvedValueOnce(emptyTasksResponse)
+        .mockResolvedValueOnce({
+          data: [createdTask],
+          total: 1,
+          page: 1,
+          limit: TASKS_PER_PAGE_IN_COMPONENT,
         });
-        
-        await waitFor(() => {
-            expect(taskService.getTasks).toHaveBeenCalledTimes(2); 
-        });
+      (taskService.createTask as Mock).mockResolvedValue(createdTask);
 
-        // Verifica se o TÍTULO DO MODAL ("Nova Tarefa") desapareceu.
-        await waitFor(() => {
-            // console.log("DOM no momento da verificação de fechamento do modal:");
-            // screen.debug(undefined, 300000);
-            expect(screen.queryByRole("heading", { name: /^Nova Tarefa$/i })).not.toBeInTheDocument();
-        });
+      render(
+        <BrowserRouter>
+          <MainPage />
+        </BrowserRouter>
+      );
+      await waitFor(() =>
+        expect(screen.getByText(/nenhuma tarefa encontrada/i)).toBeInTheDocument()
+      );
+      expect(taskService.getTasks).toHaveBeenCalledTimes(1);
 
-        await waitFor(() => {
-            // Verifica se o título da TAREFA CRIADA ("Nova Tarefa Adicionada Pelo Teste") está na lista.
-            expect(screen.getByText(newTaskTitle)).toBeInTheDocument();
+      const addTaskButton = screen.getByRole("button", { name: /adicionar nova tarefa/i });
+      await user.click(addTaskButton);
+
+      expect(screen.getByRole("heading", { name: /^Nova Tarefa$/i })).toBeInTheDocument();
+
+      await user.type(screen.getByLabelText(/título/i), newTaskTitle);
+      await user.type(screen.getByLabelText(/descrição/i), newTaskDescription);
+
+      const saveButton = screen.getByRole("button", { name: /criar tarefa/i });
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(taskService.createTask).toHaveBeenCalledWith({
+          title: newTaskTitle,
+          description: newTaskDescription,
         });
+      });
+
+      await waitFor(() => {
+        expect(taskService.getTasks).toHaveBeenCalledTimes(2);
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByRole("heading", { name: /^Nova Tarefa$/i })).not.toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(newTaskTitle)).toBeInTheDocument();
+      });
     });
   });
 
   describe("Edit Task Modal", () => {
-    const taskToEdit = mockTasksForPage1[0]; // "Tarefa 1 Teste"
+    const taskToEdit = mockTasksForPage1[0];
     const newEditedTitle = "Título Realmente Editado Agora";
 
     const taskAsReturnedByApiUpdate = { ...taskToEdit, title: newEditedTitle };
 
     const tasksAfterRefetchIncludingEdit = [
-      taskAsReturnedByApiUpdate, // Tarefa com o título atualizado
+      taskAsReturnedByApiUpdate,
       mockTasksForPage1[1],
       mockTasksForPage1[2],
       mockTasksForPage1[3],
@@ -227,8 +222,8 @@ describe("MainPage", () => {
 
     it("should open edit modal, submit, call updateTaskDetails, and refresh UI with updated task", async () => {
       (taskService.getTasks as Mock)
-        .mockResolvedValueOnce(mockPaginatedResponsePage1) // 1. Carga inicial
-        .mockResolvedValueOnce(paginatedResponseAfterEditRefetch); // 2. Chamada por fetchTasks DEPOIS do submit do modal
+        .mockResolvedValueOnce(mockPaginatedResponsePage1)
+        .mockResolvedValueOnce(paginatedResponseAfterEditRefetch);
       (taskService.updateTaskDetails as Mock).mockResolvedValue(taskAsReturnedByApiUpdate);
 
       render(
@@ -238,7 +233,6 @@ describe("MainPage", () => {
       );
       await waitFor(() => expect(screen.getByText(taskToEdit.title)).toBeInTheDocument());
 
-      // Encontra todos os botões "Editar" e clica no primeiro
       const editButtons = await screen.findAllByRole("button", { name: /editar/i });
       await user.click(editButtons[0]);
 
@@ -301,27 +295,24 @@ describe("MainPage", () => {
         expect(taskTitleElement).toHaveStyle("text-decoration: line-through");
         expect(listItem).toHaveStyle("background-color: rgb(249, 249, 249)");
 
-        // CORREÇÃO AQUI: Use 'within' para buscar dentro do listItem
         if (listItem) {
-          // Adiciona uma verificação para garantir que listItem não é null
           const reabrirButton = within(listItem).getByRole("button", { name: /reabrir/i });
           expect(reabrirButton).toBeInTheDocument();
         } else {
-          throw new Error("List item não encontrado para a tarefa atualizada."); // Ou falhe o teste de outra forma
+          throw new Error("List item não encontrado para a tarefa atualizada.");
         }
       });
     });
   });
 
   describe("Delete Task", () => {
-    const taskToDelete = mockTasksForPage1[0]; // "Tarefa 1 Teste"
-    const remainingTask = mockTasksForPage1[1]; // "Tarefa 2 Teste"
+    const taskToDelete = mockTasksForPage1[0];
+    const remainingTask = mockTasksForPage1[1];
 
     it("should call deleteTaskById after confirmation and refresh list", async () => {
       (taskService.getTasks as Mock)
-        .mockResolvedValueOnce(mockPaginatedResponsePage1) // Carga inicial
+        .mockResolvedValueOnce(mockPaginatedResponsePage1)
         .mockResolvedValueOnce({
-          // Após deletar e chamar fetchTasks
           data: [remainingTask],
           total: mockPaginatedResponsePage1.total - 1,
           page: 1,
@@ -340,7 +331,7 @@ describe("MainPage", () => {
       await waitFor(() => expect(screen.getByText(taskToDelete.title)).toBeInTheDocument());
 
       const deleteButtons = await screen.findAllByRole("button", { name: /remover/i });
-      // Assume que o botão de remover da primeira tarefa é o primeiro encontrado
+
       await user.click(deleteButtons[0]);
 
       expect(mockConfirm).toHaveBeenCalledWith("Você tem certeza que deseja remover esta tarefa?");
@@ -383,8 +374,8 @@ describe("MainPage", () => {
   describe("Pagination", () => {
     it('should fetch next page when "Próxima" is clicked', async () => {
       (taskService.getTasks as Mock)
-        .mockResolvedValueOnce(mockPaginatedResponsePage1) // Carga inicial da página 1 (total 6, limit 5 -> 2 páginas)
-        .mockResolvedValueOnce(mockPaginatedResponsePage2); // Mock para quando clicar em "Próxima"
+        .mockResolvedValueOnce(mockPaginatedResponsePage1)
+        .mockResolvedValueOnce(mockPaginatedResponsePage2);
 
       render(
         <BrowserRouter>

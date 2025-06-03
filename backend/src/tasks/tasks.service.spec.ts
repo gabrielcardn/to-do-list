@@ -1,9 +1,8 @@
-// src/tasks/tasks.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksService } from './tasks.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Task, TaskStatus } from './task.entity';
-import { Repository, ObjectLiteral, DeleteResult } from 'typeorm'; // Importe ObjectLiteral e DeleteResult
+import { Repository, ObjectLiteral, DeleteResult } from 'typeorm';
 import { UserProfile } from '../users/users.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
@@ -11,7 +10,6 @@ import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
-// Tipo MockRepository (o mesmo que usamos antes)
 type MockRepository<T extends ObjectLiteral> = Partial<
   Record<keyof Repository<T>, jest.Mock>
 >;
@@ -20,14 +18,12 @@ describe('TasksService', () => {
   let service: TasksService;
   let taskRepository: MockRepository<Task>;
 
-  // Usuário mock para os testes
   const mockUser: UserProfile = {
     id: 'user-uuid-123',
     username: 'testuser',
-    tasks: [], // Adicionado para conformar com UserProfile
+    tasks: [],
   };
 
-  // Função helper para criar o mock específico para TaskRepository
   const createTaskRepositoryMock = (): MockRepository<Task> => ({
     create: jest.fn(),
     save: jest.fn(),
@@ -50,7 +46,6 @@ describe('TasksService', () => {
     service = module.get<TasksService>(TasksService);
     taskRepository = module.get<MockRepository<Task>>(getRepositoryToken(Task));
 
-    // Limpar mocks
     taskRepository.create!.mockReset();
     taskRepository.save!.mockReset();
     taskRepository.findAndCount!.mockReset();
@@ -62,7 +57,6 @@ describe('TasksService', () => {
     expect(service).toBeDefined();
   });
 
-  // Testes para createTask()
   describe('createTask', () => {
     const createTaskDto: CreateTaskDto = {
       title: 'Nova Tarefa',
@@ -80,8 +74,8 @@ describe('TasksService', () => {
     };
 
     it('should successfully create and return a task', async () => {
-      taskRepository.create!.mockReturnValue(taskEntityToSave); // create é síncrono
-      taskRepository.save!.mockResolvedValue(savedTaskEntity); // save é assíncrono
+      taskRepository.create!.mockReturnValue(taskEntityToSave);
+      taskRepository.save!.mockResolvedValue(savedTaskEntity);
 
       const result = await service.createTask(createTaskDto, mockUser);
 
@@ -117,7 +111,6 @@ describe('TasksService', () => {
     });
   });
 
-  // Testes para getTasks()
   describe('getTasks', () => {
     const paginationDto: PaginationQueryDto = { page: 1, limit: 10 };
     const mockTasks: Task[] = [
@@ -128,7 +121,7 @@ describe('TasksService', () => {
         status: TaskStatus.PENDING,
         userId: mockUser.id,
         user: null as any,
-      }, // user pode ser null aqui
+      },
       {
         id: 'task-2',
         title: 'Tarefa 2',
@@ -158,21 +151,20 @@ describe('TasksService', () => {
     });
 
     it('should use default pagination values if not provided', async () => {
-      const defaultPaginationDto: PaginationQueryDto = {}; // page e limit são opcionais
-      taskRepository.findAndCount!.mockResolvedValue([[], 0]); // Retorna vazio para simplificar
+      const defaultPaginationDto: PaginationQueryDto = {};
+      taskRepository.findAndCount!.mockResolvedValue([[], 0]);
 
       await service.getTasks(mockUser, defaultPaginationDto);
 
       expect(taskRepository.findAndCount).toHaveBeenCalledWith(
         expect.objectContaining({
-          skip: 0, // (1 - 1) * 10
-          take: 10, // limite padrão
+          skip: 0,
+          take: 10,
         }),
       );
     });
   });
 
-  // --- Testes para getTaskById ---
   describe('getTaskById', () => {
     const taskId = 'task-uuid-xyz';
     const taskEntity = {
@@ -202,7 +194,6 @@ describe('TasksService', () => {
     });
 
     it('should throw NotFoundException if task found but does not belong to user (findOneBy returns null due to userId check)', async () => {
-      // O findOneBy já filtra por userId, então se não pertence, retorna null
       taskRepository.findOneBy!.mockResolvedValue(null);
       await expect(service.getTaskById(taskId, mockUser)).rejects.toThrow(
         NotFoundException,
@@ -210,7 +201,6 @@ describe('TasksService', () => {
     });
   });
 
-  // --- Testes para updateTaskStatus ---
   describe('updateTaskStatus', () => {
     const taskId = 'task-uuid-abc';
     const updateStatusDto: UpdateTaskStatusDto = { status: TaskStatus.DONE };
@@ -224,15 +214,12 @@ describe('TasksService', () => {
     };
     const updatedTaskEntity = { ...existingTask, status: TaskStatus.DONE };
 
-    // Adicione um beforeEach aqui se quiser resetar o spy para cada 'it' neste describe
     let getTaskByIdSpy: jest.SpyInstance;
     beforeEach(() => {
-      // Garante que o spy é refeito/resetado para cada teste 'it' se necessário
       getTaskByIdSpy = jest.spyOn(service, 'getTaskById');
     });
 
     it('should update task status successfully', async () => {
-      // Simula que getTaskById (que usa findOneBy) encontra a tarefa
       jest
         .spyOn(service, 'getTaskById')
         .mockResolvedValueOnce(existingTask as Task);
@@ -261,7 +248,6 @@ describe('TasksService', () => {
     });
   });
 
-  // --- Testes para updateTask ---
   describe('updateTask', () => {
     const taskId = 'task-uuid-def';
     const updateTaskDto: UpdateTaskDto = {
@@ -289,15 +275,12 @@ describe('TasksService', () => {
       jest
         .spyOn(service, 'getTaskById')
         .mockResolvedValueOnce(existingTask as Task);
-      taskRepository.save!.mockResolvedValue(finalUpdatedTask); // save retorna a entidade completamente atualizada
+      taskRepository.save!.mockResolvedValue(finalUpdatedTask);
 
       const result = await service.updateTask(taskId, updateTaskDto, mockUser);
 
       expect(service.getTaskById).toHaveBeenCalledWith(taskId, mockUser);
-      // O save é chamado com a entidade 'task' modificada.
-      // Precisamos verificar se os campos corretos foram alterados antes do save.
-      // A verificação exata do objeto passado para save pode ser complexa se a ordem das atualizações importar.
-      // É mais simples verificar o resultado final.
+
       expect(taskRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           id: taskId,
@@ -328,7 +311,7 @@ describe('TasksService', () => {
       expect(taskRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           title: partialUpdateDto.title,
-          description: existingTask.description, // Descrição deve permanecer a mesma
+          description: existingTask.description,
         }),
       );
       expect(result.title).toEqual(partialUpdateDto.title);
@@ -345,7 +328,6 @@ describe('TasksService', () => {
     });
   });
 
-  // --- Testes para deleteTask ---
   describe('deleteTask', () => {
     const taskId = 'task-uuid-ghi';
     const existingTask = {
@@ -361,13 +343,13 @@ describe('TasksService', () => {
       jest
         .spyOn(service, 'getTaskById')
         .mockResolvedValueOnce(existingTask as Task);
-      // Mock para o resultado da operação de delete
+
       const deleteResult: DeleteResult = { affected: 1, raw: [] };
       taskRepository.delete!.mockResolvedValue(deleteResult);
 
       await expect(
         service.deleteTask(taskId, mockUser),
-      ).resolves.toBeUndefined(); // deleteTask retorna void
+      ).resolves.toBeUndefined();
 
       expect(service.getTaskById).toHaveBeenCalledWith(taskId, mockUser);
       expect(taskRepository.delete).toHaveBeenCalledWith({
@@ -386,14 +368,12 @@ describe('TasksService', () => {
     });
 
     it('should throw NotFoundException if delete operation affects 0 rows', async () => {
-      // getTaskById encontra a tarefa desta vez
       jest
         .spyOn(service, 'getTaskById')
         .mockResolvedValueOnce(existingTask as Task);
-      const deleteResult: DeleteResult = { affected: 0, raw: [] }; // Nenhuma linha afetada
+      const deleteResult: DeleteResult = { affected: 0, raw: [] };
       taskRepository.delete!.mockResolvedValue(deleteResult);
 
-      // Chame deleteTask apenas uma vez
       await expect(service.deleteTask(taskId, mockUser)).rejects.toThrow(
         new NotFoundException(
           `Tarefa com ID "${taskId}" não encontrada para deleção.`,

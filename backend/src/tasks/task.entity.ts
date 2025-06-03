@@ -1,4 +1,3 @@
-// src/tasks/task.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from '../users/user.entity';
 
@@ -20,9 +19,9 @@ export class Task {
   description: string;
 
   @Column({
-    type: 'nvarchar', // Alterado de 'enum' para 'nvarchar' (ou 'varchar')
-    length: 50,       // Defina um tamanho apropriado para os valores do seu enum (ex: 'IN_PROGRESS')
-    enum: TaskStatus, // Mantenha isso para o TypeORM saber que é um enum no lado da aplicação
+    type: 'nvarchar',
+    length: 50,
+    enum: TaskStatus,
     default: TaskStatus.PENDING,
   })
   status: TaskStatus;

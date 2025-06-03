@@ -1,6 +1,11 @@
-// src/users/user.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, Index, OneToMany } from 'typeorm'; // Adicione OneToMany
-import { Task } from '../tasks/task.entity'; // Importe a entidade Task
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  OneToMany,
+} from 'typeorm';
+import { Task } from '../tasks/task.entity';
 
 @Entity('users')
 export class User {
@@ -14,7 +19,6 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: false })
   password: string;
 
-  // Relacionamento: Um usuário pode ter muitas tarefas
-  @OneToMany(() => Task, (task) => task.user, { eager: true }) // eager: true pode ser útil se você sempre quer as tarefas ao carregar um usuário, ou false para carregar sob demanda
-  tasks: Task[]; // Um array de tarefas
+  @OneToMany(() => Task, (task) => task.user, { eager: true })
+  tasks: Task[];
 }

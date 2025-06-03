@@ -1,16 +1,12 @@
-// src/tasks/tasks.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import { Task } from './task.entity';
-import { AuthModule } from '../auth/auth.module'; // Para acesso à configuração do Passport/JWT
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Task]), // Disponibiliza Repository<Task>
-    AuthModule, // Importa o AuthModule para que os guards e estratégias de autenticação estejam disponíveis
-  ],
+  imports: [TypeOrmModule.forFeature([Task]), AuthModule],
   controllers: [TasksController],
   providers: [TasksService],
 })

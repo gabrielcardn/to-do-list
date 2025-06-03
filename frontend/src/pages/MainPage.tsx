@@ -1,4 +1,3 @@
-// src/pages/MainPage.tsx
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,7 +5,7 @@ import {
   createTask,
   updateTaskStatus,
   updateTaskDetails,
-  deleteTaskById, // Importa a função de deletar
+  deleteTaskById,
   type Task,
   type PaginatedTasksResponse,
   type CreateTaskPayload,
@@ -14,14 +13,13 @@ import {
   type UpdateTaskDetailsPayload,
 } from "../services/taskService";
 
-// Estilos do Modal (podem ser movidos para um arquivo .css dedicado)
 const modalOverlayStyles: React.CSSProperties = {
   position: "fixed",
   top: 0,
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, 0.7)", // Overlay um pouco mais escuro
+  backgroundColor: "rgba(0, 0, 0, 0.7)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -29,17 +27,17 @@ const modalOverlayStyles: React.CSSProperties = {
 };
 
 const modalContentStyles: React.CSSProperties = {
-  backgroundColor: "#ffffff", // Fundo branco para o conteúdo do modal
-  color: "#333", // Cor de texto escura para bom contraste
+  backgroundColor: "#ffffff",
+  color: "#333",
   padding: "25px",
   borderRadius: "8px",
-  minWidth: "350px", // Um pouco maior para conforto
-  maxWidth: "500px", // Limite máximo
+  minWidth: "350px",
+  maxWidth: "500px",
   boxShadow: "0 5px 15px rgba(0, 0, 0, 0.3)",
 };
 
 const formInputStyles: React.CSSProperties = {
-  width: "calc(100% - 16px)", // Ajusta para padding interno
+  width: "calc(100% - 16px)",
   marginBottom: "15px",
   padding: "10px",
   border: "1px solid #ccc",
@@ -48,7 +46,7 @@ const formInputStyles: React.CSSProperties = {
 };
 
 const formTextareaStyles: React.CSSProperties = {
-  ...formInputStyles, // Herda estilos do input
+  ...formInputStyles,
   minHeight: "80px",
   resize: "vertical",
 };
@@ -78,14 +76,12 @@ const secondaryButtonStyles: React.CSSProperties = {
   color: "white",
 };
 
-// Objeto para status da tarefa no frontend
 const TaskFrontendStatus = {
   PENDING: "PENDING",
   IN_PROGRESS: "IN_PROGRESS",
   DONE: "DONE",
 } as const;
-type TaskFrontendStatusValue = typeof TaskFrontendStatus[keyof typeof TaskFrontendStatus];
-
+type TaskFrontendStatusValue = (typeof TaskFrontendStatus)[keyof typeof TaskFrontendStatus];
 
 function MainPage() {
   const navigate = useNavigate();
@@ -194,23 +190,21 @@ function MainPage() {
           description: taskFormDescription,
         };
         await createTask(taskData);
-        shouldGoToFirstPage = true; // Após adicionar, geralmente queremos ver o item (pode estar na primeira página)
+        shouldGoToFirstPage = true;
       } else if (modalMode === "edit" && currentEditingTask) {
         const taskUpdateData: UpdateTaskDetailsPayload = {
           title: taskFormTitle,
           description: taskFormDescription,
         };
         const updatedTask = await updateTaskDetails(currentEditingTask.id, taskUpdateData);
-        setTasks((prevTasks) =>
-          prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
-        );
+        setTasks((prevTasks) => prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
       }
       closeTaskFormModal();
-      // Se adicionou, e não está na primeira página, vá para a primeira. Senão, apenas re-busque a página atual.
+
       if (shouldGoToFirstPage && currentPage !== 1) {
-        setCurrentPage(1); // Isso disparará o useEffect para chamar fetchTasks(1)
+        setCurrentPage(1);
       } else {
-        fetchTasks(currentPage); // Re-busca a página atual para consistência de total/etc.
+        fetchTasks(currentPage);
       }
     } catch (err: any) {
       console.error(`Falha ao ${modalMode === "add" ? "criar" : "atualizar"} tarefa:`, err);
@@ -230,57 +224,61 @@ function MainPage() {
     const payload: UpdateTaskStatusPayload = { status: newStatus };
     try {
       const updatedTask = await updateTaskStatus(task.id, payload);
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
-      );
+      setTasks((prevTasks) => prevTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
     } catch (err: any) {
       console.error("Falha ao atualizar status da tarefa:", err);
       setPageError(`Erro ao atualizar status: ${err.message}`);
     }
   };
 
-  // Função para deletar tarefa
   const handleDeleteTask = async (taskId: string) => {
     if (!window.confirm("Você tem certeza que deseja remover esta tarefa?")) {
       return;
     }
     try {
       await deleteTaskById(taskId);
-      setPageError(null); // Limpa erros anteriores
-      // Re-busca as tarefas da página atual.
-      // Se a lista de tarefas na página atual ficar vazia e não for a primeira página,
-      // podemos tentar buscar a página anterior.
-      // Se a última tarefa da página atual for removida
+      setPageError(null);
+
       if (tasks.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1); // Isso vai disparar o fetchTasks para a página anterior
+        setCurrentPage(currentPage - 1);
       } else {
-        fetchTasks(currentPage); // Re-busca a página atual
+        fetchTasks(currentPage);
       }
       alert("Tarefa removida com sucesso!");
     } catch (err: any) {
-      console.error('Falha ao remover tarefa:', err);
-      setPageError(err.message || 'Não foi possível remover a tarefa.');
+      console.error("Falha ao remover tarefa:", err);
+      setPageError(err.message || "Não foi possível remover a tarefa.");
     }
   };
-
 
   if (isLoadingPage && tasks.length === 0) {
     return <div style={{ padding: "20px", textAlign: "center" }}>Carregando tarefas...</div>;
   }
 
   if (pageError && tasks.length === 0) {
-    return <div style={{ padding: "20px", color: "red", textAlign: "center" }}>Erro ao carregar tarefas: {pageError}</div>;
+    return (
+      <div style={{ padding: "20px", color: "red", textAlign: "center" }}>
+        Erro ao carregar tarefas: {pageError}
+      </div>
+    );
   }
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
         <h1>Minha Lista de Tarefas</h1>
         <div>
           <button onClick={openAddTaskModal} style={primaryButtonStyles}>
             Adicionar Nova Tarefa
           </button>
-          <button onClick={handleLogout} style={{ ...secondaryButtonStyles, marginLeft: '10px' }}>
+          <button onClick={handleLogout} style={{ ...secondaryButtonStyles, marginLeft: "10px" }}>
             Sair (Logout)
           </button>
         </div>
@@ -289,12 +287,24 @@ function MainPage() {
       {isTaskFormModalOpen && (
         <div style={modalOverlayStyles} data-testid="task-form-modal">
           <div style={modalContentStyles}>
-            <h2 style={{ marginTop: 0, marginBottom: "20px", borderBottom: "1px solid #eee", paddingBottom: "10px" }}>
+            <h2
+              style={{
+                marginTop: 0,
+                marginBottom: "20px",
+                borderBottom: "1px solid #eee",
+                paddingBottom: "10px",
+              }}
+            >
               {modalMode === "add" ? "Nova Tarefa" : "Editar Tarefa"}
             </h2>
             <form onSubmit={handleTaskFormSubmit}>
               <div>
-                <label htmlFor="taskFormTitle" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Título:</label>
+                <label
+                  htmlFor="taskFormTitle"
+                  style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
+                >
+                  Título:
+                </label>
                 <input
                   type="text"
                   id="taskFormTitle"
@@ -306,7 +316,12 @@ function MainPage() {
                 />
               </div>
               <div>
-                <label htmlFor="taskFormDescription" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Descrição:</label>
+                <label
+                  htmlFor="taskFormDescription"
+                  style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
+                >
+                  Descrição:
+                </label>
                 <textarea
                   id="taskFormDescription"
                   value={taskFormDescription}
@@ -315,7 +330,11 @@ function MainPage() {
                   style={formTextareaStyles}
                 />
               </div>
-              {taskFormError && <p style={{ color: "red", fontSize: "0.9em", marginTop: "10px" }}>{taskFormError}</p>}
+              {taskFormError && (
+                <p style={{ color: "red", fontSize: "0.9em", marginTop: "10px" }}>
+                  {taskFormError}
+                </p>
+              )}
               <div style={formButtonContainerStyles}>
                 <button
                   type="button"
@@ -338,9 +357,13 @@ function MainPage() {
         </div>
       )}
 
-      {isLoadingPage && tasks.length > 0 && <p style={{textAlign: 'center'}}>Atualizando tarefas...</p>}
+      {isLoadingPage && tasks.length > 0 && (
+        <p style={{ textAlign: "center" }}>Atualizando tarefas...</p>
+      )}
       {!isLoadingPage && tasks.length === 0 && !pageError && (
-        <p style={{textAlign: 'center', marginTop: '20px'}}>Nenhuma tarefa encontrada. Clique em "Adicionar Nova Tarefa" para começar!</p>
+        <p style={{ textAlign: "center", marginTop: "20px" }}>
+          Nenhuma tarefa encontrada. Clique em "Adicionar Nova Tarefa" para começar!
+        </p>
       )}
 
       {tasks.length > 0 && (
@@ -359,39 +382,91 @@ function MainPage() {
                   boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                 }}
               >
-                <h3 style={{ marginTop: 0, textDecoration: task.status === TaskFrontendStatus.DONE ? "line-through" : "none", color: task.status === TaskFrontendStatus.DONE ? "#888" : "#333" }}>
+                <h3
+                  style={{
+                    marginTop: 0,
+                    textDecoration:
+                      task.status === TaskFrontendStatus.DONE ? "line-through" : "none",
+                    color: task.status === TaskFrontendStatus.DONE ? "#888" : "#333",
+                  }}
+                >
                   {task.title}
                 </h3>
-                <p style={{ color: task.status === TaskFrontendStatus.DONE ? "#999" : "#555", textDecoration: task.status === TaskFrontendStatus.DONE ? "line-through" : "none", whiteSpace: 'pre-wrap' }}>
+                <p
+                  style={{
+                    color: task.status === TaskFrontendStatus.DONE ? "#999" : "#555",
+                    textDecoration:
+                      task.status === TaskFrontendStatus.DONE ? "line-through" : "none",
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
                   {task.description || "Sem descrição"}
                 </p>
                 <p style={{ fontSize: "0.9em", color: "#777" }}>
-                  Status: <span style={{ fontWeight: 'bold', color: task.status === TaskFrontendStatus.DONE ? 'green' : (task.status === TaskFrontendStatus.IN_PROGRESS ? 'orange' : 'black')}}>{task.status}</span>
+                  Status:{" "}
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      color:
+                        task.status === TaskFrontendStatus.DONE
+                          ? "green"
+                          : task.status === TaskFrontendStatus.IN_PROGRESS
+                          ? "orange"
+                          : "black",
+                    }}
+                  >
+                    {task.status}
+                  </span>
                 </p>
-                <div style={{ marginTop: '10px' }}>
-                  <button onClick={() => handleToggleTaskStatus(task)} style={{ ...formButtonStyles, backgroundColor: '#28a745', color: 'white', marginRight: '5px'}}>
-                    {task.status === TaskFrontendStatus.DONE
-                      ? "Reabrir"
-                      : "Concluir"}
+                <div style={{ marginTop: "10px" }}>
+                  <button
+                    onClick={() => handleToggleTaskStatus(task)}
+                    style={{
+                      ...formButtonStyles,
+                      backgroundColor: "#28a745",
+                      color: "white",
+                      marginRight: "5px",
+                    }}
+                  >
+                    {task.status === TaskFrontendStatus.DONE ? "Reabrir" : "Concluir"}
                   </button>
-                  <button onClick={() => openEditTaskModal(task)} style={{ ...formButtonStyles, backgroundColor: '#ffc107', color: 'black', marginRight: '5px'}}>
+                  <button
+                    onClick={() => openEditTaskModal(task)}
+                    style={{
+                      ...formButtonStyles,
+                      backgroundColor: "#ffc107",
+                      color: "black",
+                      marginRight: "5px",
+                    }}
+                  >
                     Editar
                   </button>
-                  <button onClick={() => handleDeleteTask(task.id)} style={{...formButtonStyles, backgroundColor: '#dc3545', color: 'white'}}>
+                  <button
+                    onClick={() => handleDeleteTask(task.id)}
+                    style={{ ...formButtonStyles, backgroundColor: "#dc3545", color: "white" }}
+                  >
                     Remover
                   </button>
                 </div>
               </li>
             ))}
           </ul>
-          <div style={{ marginTop: "20px", textAlign: 'center' }}>
-            <button onClick={handlePreviousPage} disabled={currentPage <= 1 || isLoadingPage} style={secondaryButtonStyles}>
+          <div style={{ marginTop: "20px", textAlign: "center" }}>
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage <= 1 || isLoadingPage}
+              style={secondaryButtonStyles}
+            >
               Anterior
             </button>
-            <span style={{ margin: "0 15px", verticalAlign: 'middle' }}>
+            <span style={{ margin: "0 15px", verticalAlign: "middle" }}>
               Página {currentPage} de {totalPages} (Total: {totalTasks})
             </span>
-            <button onClick={handleNextPage} disabled={currentPage >= totalPages || isLoadingPage} style={primaryButtonStyles}>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage >= totalPages || isLoadingPage}
+              style={primaryButtonStyles}
+            >
               Próxima
             </button>
           </div>

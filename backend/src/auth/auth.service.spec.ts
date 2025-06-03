@@ -1,12 +1,13 @@
-// src/auth/auth.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { UsersService, UserProfile, CreateUserDto } from '../users/users.service';
+import {
+  UsersService,
+  UserProfile,
+  CreateUserDto,
+} from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/user.entity';
-import { Task } from '../tasks/task.entity'; // Importe Task se for usar no tipo tasks: Task[]
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
@@ -15,8 +16,8 @@ jest.mock('bcrypt', () => ({
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let usersService: UsersService; // Mocked instance
-  let jwtService: JwtService;     // Mocked instance
+  let usersService: UsersService;
+  let jwtService: JwtService;
 
   const mockUsersService = {
     create: jest.fn(),
@@ -57,9 +58,16 @@ describe('AuthService', () => {
   });
 
   describe('register', () => {
-    const createUserDto: CreateUserDto = { username: 'newuser', password: 'password123' };
-    // CORRIGIDO: Adicionado tasks: []
-    const userProfile: UserProfile = { id: 'uuid-newUser', username: 'newuser', tasks: [] };
+    const createUserDto: CreateUserDto = {
+      username: 'newuser',
+      password: 'password123',
+    };
+
+    const userProfile: UserProfile = {
+      id: 'uuid-newUser',
+      username: 'newuser',
+      tasks: [],
+    };
 
     it('should call usersService.create and return a user profile', async () => {
       mockUsersService.create.mockResolvedValue(userProfile);
@@ -83,10 +91,14 @@ describe('AuthService', () => {
       id: 'uuid-testuser',
       username,
       password: 'hashedPassword',
-      tasks: [], // Adicionado tasks: [] aqui também
+      tasks: [],
     };
-    // CORRIGIDO: Adicionado tasks: []
-    const expectedUserProfile: UserProfile = { id: mockUser.id, username: mockUser.username, tasks: [] };
+
+    const expectedUserProfile: UserProfile = {
+      id: mockUser.id,
+      username: mockUser.username,
+      tasks: [],
+    };
 
     it('should return user profile if credentials are valid', async () => {
       mockUsersService.findOneByUsername.mockResolvedValue(mockUser);
@@ -117,14 +129,17 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    // CORRIGIDO: Adicionado tasks: []
-    const userProfileInput: UserProfile = { id: 'uuid-testuser', username: 'testuser', tasks: [] };
+    const userProfileInput: UserProfile = {
+      id: 'uuid-testuser',
+      username: 'testuser',
+      tasks: [],
+    };
     const accessToken = 'mockAccessToken';
 
     it('should return an access token for a valid user profile', async () => {
       mockJwtService.sign.mockReturnValue(accessToken);
 
-      const result = await authService.login(userProfileInput); // Passa o UserProfile completo
+      const result = await authService.login(userProfileInput);
       expect(mockJwtService.sign).toHaveBeenCalledWith({
         username: userProfileInput.username,
         sub: userProfileInput.id,

@@ -1,32 +1,27 @@
-// src/pages/LoginPage.test.tsx
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event"; // Para interações de usuário mais realistas
-import { BrowserRouter } from "react-router-dom"; // Necessário porque LoginPage usa useNavigate
+import userEvent from "@testing-library/user-event";
+import { BrowserRouter } from "react-router-dom";
 import LoginPage from "./LoginPage";
-import * as authService from "../services/authService"; // Mockar o módulo de serviço
+import * as authService from "../services/authService";
 
-// Mock para o módulo de authService
 vi.mock("../services/authService", () => ({
   loginUser: vi.fn(),
-  // Adicione outros mocks de funções do authService se LoginPage os usar
 }));
 
-// Mock para useNavigate (o LoginPage usa)
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async (importOriginal) => {
   const actual = await importOriginal<typeof import("react-router-dom")>();
   return {
-    ...actual, // Mantém outras exportações de react-router-dom
-    useNavigate: () => mockNavigate, // Sobrescreve useNavigate com nosso mock
+    ...actual,
+    useNavigate: () => mockNavigate,
   };
 });
 
 describe("LoginPage", () => {
   beforeEach(() => {
-    // Limpa os mocks antes de cada teste
-    vi.clearAllMocks(); // Limpa todos os mocks do Vitest, incluindo o de useNavigate e authService
-    localStorage.clear(); // Limpa o localStorage para garantir isolamento
+    vi.clearAllMocks();
+    localStorage.clear();
   });
 
   it("should render login form correctly", () => {
@@ -75,7 +70,6 @@ describe("LoginPage", () => {
     await user.type(screen.getByLabelText(/senha/i), "goodpassword");
     await user.click(screen.getByRole("button", { name: /entrar/i }));
 
-    // Espera que loginUser seja chamado e o restante da lógica assíncrona termine
     await waitFor(() => {
       expect(authService.loginUser).toHaveBeenCalledTimes(1);
       expect(authService.loginUser).toHaveBeenCalledWith({
@@ -108,7 +102,6 @@ describe("LoginPage", () => {
     await user.type(screen.getByLabelText(/senha/i), "badpassword");
     await user.click(screen.getByRole("button", { name: /entrar/i }));
 
-    // Espera que a mensagem de erro apareça no documento
     await waitFor(() => {
       expect(screen.getByText(errorMessage)).toBeInTheDocument();
     });

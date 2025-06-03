@@ -1,9 +1,8 @@
-// src/users/users.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository, ObjectLiteral } from 'typeorm'; // ObjectLiteral importado
+import { Repository, ObjectLiteral } from 'typeorm';
 import { ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
@@ -12,14 +11,14 @@ jest.mock('bcrypt', () => ({
   compare: jest.fn(),
 }));
 
-// Tipo MockRepository corrigido
-type MockRepository<T extends ObjectLiteral> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+type MockRepository<T extends ObjectLiteral> = Partial<
+  Record<keyof Repository<T>, jest.Mock>
+>;
 
 describe('UsersService', () => {
   let service: UsersService;
-  let userRepository: MockRepository<User>; // Tipado como MockRepository<User>
+  let userRepository: MockRepository<User>;
 
-  // Função helper para criar o mock específico para User
   const createMockUserRepository = (): MockRepository<User> => ({
     findOneBy: jest.fn(),
     create: jest.fn(),
@@ -39,10 +38,9 @@ describe('UsersService', () => {
 
     service = module.get<UsersService>(UsersService);
     userRepository = module.get<MockRepository<User>>(getRepositoryToken(User));
-    
+
     (bcrypt.hash as jest.Mock).mockClear();
-    // Limpar mocks de userRepository antes de cada teste 'it' para evitar interferência
-    // As funções de mock são garantidas como existentes pela createMockUserRepository
+
     userRepository.findOneBy!.mockReset();
     userRepository.create!.mockReset();
     userRepository.save!.mockReset();
@@ -55,13 +53,12 @@ describe('UsersService', () => {
   describe('create', () => {
     const createUserDto = { username: 'testuser', password: 'password123' };
     const hashedPassword = 'hashedPassword123';
-    // Simula a entidade que repository.create retornaria (sem ID ainda, ou com ID se o create fizesse isso)
-    // e que seria passada para save.
-    const userEntityToSave = { 
+
+    const userEntityToSave = {
       username: createUserDto.username,
       password: hashedPassword,
     };
-    // Simula a entidade retornada por repository.save (com ID)
+
     const savedUserEntity = {
       id: 'some-uuid',
       username: createUserDto.username,
@@ -73,34 +70,40 @@ describe('UsersService', () => {
     });
 
     it('should create and return a user profile if username does not exist', async () => {
-      userRepository.findOneBy!.mockResolvedValue(null); // Usuário não existe
-      // userRepository.create é síncrono e retorna o objeto que será salvo
-      userRepository.create!.mockReturnValue(userEntityToSave); 
-      userRepository.save!.mockResolvedValue(savedUserEntity); // save é assíncrono
+      userRepository.findOneBy!.mockResolvedValue(null);
+
+      userRepository.create!.mockReturnValue(userEntityToSave);
+      userRepository.save!.mockResolvedValue(savedUserEntity);
 
       const result = await service.create(createUserDto);
 
-      expect(userRepository.findOneBy).toHaveBeenCalledWith({ username: createUserDto.username });
+      expect(userRepository.findOneBy).toHaveBeenCalledWith({
+        username: createUserDto.username,
+      });
       expect(bcrypt.hash).toHaveBeenCalledWith(createUserDto.password, 10);
       expect(userRepository.create).toHaveBeenCalledWith({
         username: createUserDto.username,
         password: hashedPassword,
       });
       expect(userRepository.save).toHaveBeenCalledWith(userEntityToSave);
-      expect(result).toEqual({ // O serviço retorna UserProfile (sem a senha)
+      expect(result).toEqual({
         id: savedUserEntity.id,
         username: savedUserEntity.username,
       });
     });
 
     it('should throw a ConflictException if username already exists', async () => {
-      userRepository.findOneBy!.mockResolvedValue(savedUserEntity); // Usuário já existe
+      userRepository.findOneBy!.mockResolvedValue(savedUserEntity);
 
-      await expect(service.create(createUserDto)).rejects.toThrow(ConflictException);
-      await expect(service.create(createUserDto)).rejects.toThrow('Username already exists');
+      await expect(service.create(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(service.create(createUserDto)).rejects.toThrow(
+        'Username already exists',
+      );
 
       expect(bcrypt.hash).not.toHaveBeenCalled();
-      expect(userRepository.create).not.toHaveBeenCalled(); // create não deve ser chamado se o usuário já existe
+      expect(userRepository.create).not.toHaveBeenCalled();
       expect(userRepository.save).not.toHaveBeenCalled();
     });
   });
@@ -126,20 +129,24 @@ describe('UsersService', () => {
 
   describe('findOneById', () => {
     const userId = 'some-uuid';
-    const mockUser = { id: userId, username: 'testuser', password: 'hashedPassword' };
-    
+    const mockUser = {
+      id: userId,
+      username: 'testuser',
+      password: 'hashedPassword',
+    };
+
     it('should return a user if found by id', async () => {
-        userRepository.findOneBy!.mockResolvedValue(mockUser);
-        const result = await service.findOneById(userId);
-        expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: userId });
-        expect(result).toEqual(mockUser);
+      userRepository.findOneBy!.mockResolvedValue(mockUser);
+      const result = await service.findOneById(userId);
+      expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: userId });
+      expect(result).toEqual(mockUser);
     });
 
     it('should return null if user not found by id', async () => {
-        userRepository.findOneBy!.mockResolvedValue(null);
-        const result = await service.findOneById(userId); // Corrigido para findOneById
-        expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: userId });
-        expect(result).toBeNull();
+      userRepository.findOneBy!.mockResolvedValue(null);
+      const result = await service.findOneById(userId);
+      expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: userId });
+      expect(result).toBeNull();
     });
   });
 });

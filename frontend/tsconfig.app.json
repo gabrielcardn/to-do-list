@@ -24,7 +24,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "types": ["vite/client", "@testing-library/jest-dom", "vitest/globals"], // Removido "node"
+    "types": ["vite/client", "@testing-library/jest-dom", "vitest/globals"],
 
   },
   "include": [

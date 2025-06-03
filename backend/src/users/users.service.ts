@@ -1,4 +1,3 @@
-// src/users/users.service.ts
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -6,11 +5,12 @@ import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
-// DTO (Data Transfer Object) para criação de usuário
 export class CreateUserDto {
   @IsNotEmpty({ message: 'O nome de usuário não pode estar vazio.' })
   @IsString()
-  @MinLength(3, { message: 'O nome de usuário deve ter pelo menos 3 caracteres.' })
+  @MinLength(3, {
+    message: 'O nome de usuário deve ter pelo menos 3 caracteres.',
+  })
   username: string;
 
   @IsNotEmpty({ message: 'A senha não pode estar vazia.' })
@@ -19,8 +19,6 @@ export class CreateUserDto {
   password: string;
 }
 
-// Definindo um tipo para o usuário retornado sem a senha
-// Omit<User, 'password'> cria um tipo que tem todas as propriedades de User exceto 'password'
 export type UserProfile = Omit<User, 'password'>;
 
 @Injectable()
@@ -30,7 +28,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserProfile> { // Alterado o tipo de retorno
+  async create(createUserDto: CreateUserDto): Promise<UserProfile> {
     const { username, password } = createUserDto;
 
     const existingUser = await this.usersRepository.findOneBy({ username });
@@ -48,16 +46,15 @@ export class UsersService {
 
     const savedUser = await this.usersRepository.save(userEntity);
 
-    // Retorna o usuário sem a propriedade password usando desestruturação
-    const { password: _, ...userProfile } = savedUser; // _ indica que a variável password não será usada
+    const { password: _, ...userProfile } = savedUser;
     return userProfile;
   }
 
-  async findOneByUsername(username: string): Promise<User | null> { // Alterado para User | null
+  async findOneByUsername(username: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ username });
   }
 
-  async findOneById(id: string): Promise<User | null> { // Alterado para User | null
+  async findOneById(id: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ id });
   }
 }

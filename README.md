@@ -76,7 +76,7 @@ git clone github.com/gabrielcardn/to-do-list/
 
 Crie arquivos .env para o backend e para o frontend baseados nos exemplos abaixo. Estes arquivos são cruciais para configurar a conexão com o banco de dados, segredos de JWT, e outras informações específicas do ambiente.
 
-#### a. Backend (backend/.env)
+### a. Backend (backend/.env)
 Navegue até a pasta backend e crie um arquivo .env com o seguinte conteúdo.
 ⚠️ Importante: Substitua os valores de placeholder (especialmente DB_PASSWORD e JWT_SECRET) por valores seguros e adequados ao seu ambiente
 
@@ -244,3 +244,76 @@ A API do backend fornece os seguintes endpoints. Todos os endpoints de `/tasks` 
         * Resposta de Sucesso (200): Retorna o objeto da tarefa atualizada.
     * `DELETE /tasks/:id`: Remove uma tarefa do usuário autenticado.
         * Resposta de Sucesso (204): Sem conteúdo no corpo da resposta.
+
+#### Mínimo para rodar
+# To-Do List - Instruções Rápidas de Execução
+
+## 1. Criar os arquivos `.env`
+
+### backend/.env
+
+DB_TYPE=mssql  
+DB_HOST=localhost  
+DB_PORT=1433  
+DB_USERNAME=sa  
+DB_PASSWORD=YourStrong(!)Password123  
+DB_DATABASE=todolist_db  
+JWT_SECRET=SuaChaveSuperSecretaForteCom32+Caracteres  
+JWT_EXPIRATION_TIME=3600s  
+
+### frontend/.env
+
+VITE_API_BASE_URL=http://localhost:3000
+
+---
+
+## 2. Subir o banco de dados com Docker
+
+```bash
+cd backend
+docker-compose up -d
+```
+
+---
+
+## 3. Instalar dependências e rodar migrations
+
+### Backend
+
+```bash
+cd backend
+npm install
+npm run migration:run
+```
+
+### Frontend
+
+```bash
+cd ../frontend
+npm install
+```
+
+---
+
+## 4. Rodar a aplicação
+
+### Backend
+
+```bash
+cd backend
+npm run start:dev
+```
+
+### Frontend (em outro terminal)
+
+```bash
+cd frontend
+npm run dev
+```
+
+---
+
+## 5. Acessar no navegador
+
+Frontend: [http://localhost:5173](http://localhost:5173)  
+Backend: [http://localhost:3000](http://localhost:3000)

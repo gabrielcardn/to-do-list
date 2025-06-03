@@ -1,22 +1,15 @@
-// src/pages/RegistrationPage.test.tsx
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { BrowserRouter, MemoryRouter, Route, Routes } from "react-router-dom"; // MemoryRouter para testar navegação
+import { BrowserRouter, MemoryRouter, Route, Routes } from "react-router-dom";
 import RegistrationPage from "./RegistrationPage";
 import * as authService from "../services/authService";
 import LoginPage from "./LoginPage";
 
-// Mock para o módulo de authService
 vi.mock("../services/authService", () => ({
   registerUser: vi.fn(),
-  // Adicione outros mocks de funções do authService se RegistrationPage os usar
 }));
 
-// Mock para useNavigate (embora o teste de redirecionamento abaixo use MemoryRouter)
-// Se RegistrationPage usar useNavigate diretamente para algo além do redirecionamento pós-submit,
-// você pode mocká-lo como fizemos para LoginPage.
-// Por agora, focaremos no resultado da navegação com MemoryRouter.
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async (importOriginal) => {
   const actual = await importOriginal<typeof import("react-router-dom")>();
@@ -41,7 +34,7 @@ describe("RegistrationPage", () => {
 
     expect(screen.getByRole("heading", { name: /registrar nova conta/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/usuário/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^senha/i)).toBeInTheDocument(); // Correspondência exata para "Senha"
+    expect(screen.getByLabelText(/^senha/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirmar senha/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /registrar/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /faça login/i })).toBeInTheDocument();
@@ -80,11 +73,9 @@ describe("RegistrationPage", () => {
 
   it("should call registerUser and attempt to navigate to /login on successful registration", async () => {
     const user = userEvent.setup();
-    const mockRegisteredUser = { id: "user-123", username: "newuser" }; // Adapte se UserProfile espera 'tasks'
+    const mockRegisteredUser = { id: "user-123", username: "newuser" };
     (authService.registerUser as Mock).mockResolvedValue(mockRegisteredUser);
 
-    // Para este teste, BrowserRouter é suficiente se estamos apenas verificando a chamada do mockNavigate.
-    // MemoryRouter é mais útil se você não mockar useNavigate e quiser ver a mudança real de componente.
     render(
       <BrowserRouter>
         <RegistrationPage />
@@ -111,7 +102,6 @@ describe("RegistrationPage", () => {
       expect(alertSpy).toHaveBeenCalledWith("Registro bem-sucedido! Você pode fazer login agora.");
     });
 
-    // VERIFIQUE SE O MOCKNAVIGATE FOI CHAMADO:
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith("/login");
     });
@@ -133,18 +123,18 @@ describe("RegistrationPage", () => {
     await waitFor(() => {
       expect(screen.getByText(errorMessage)).toBeInTheDocument();
     });
-    expect(mockNavigate).not.toHaveBeenCalled(); // Não deve navegar se o registro falhar
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it('should render LoginPage when navigating to /login', () => {
-  render(
-    <MemoryRouter initialEntries={['/login']}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        {/* Adicione outras rotas que App.tsx define, se necessário para o contexto */}
-      </Routes>
-    </MemoryRouter>
-  );
-  expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
-});
+  it("should render LoginPage when navigating to /login", () => {
+    render(
+      <MemoryRouter initialEntries={["/login"]}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          {/* Adicione outras rotas que App.tsx define, se necessário para o contexto */}
+        </Routes>
+      </MemoryRouter>
+    );
+    expect(screen.getByRole("heading", { name: /login/i })).toBeInTheDocument();
+  });
 });

@@ -1,13 +1,12 @@
-// src/App.tsx
-import React, { type JSX } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import MainPage from './pages/MainPage';
-import RegistrationPage from './pages/RegistrationPage'; // <-- Importe aqui
-import './App.css';
+import React, { type JSX } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import MainPage from "./pages/MainPage";
+import RegistrationPage from "./pages/RegistrationPage";
+import "./App.css";
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem("accessToken");
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -32,7 +31,7 @@ function App() {
           <Route
             path="/"
             element={
-              localStorage.getItem('accessToken') ? (
+              localStorage.getItem("accessToken") ? (
                 <Navigate to="/main" replace />
               ) : (
                 <Navigate to="/login" replace />
