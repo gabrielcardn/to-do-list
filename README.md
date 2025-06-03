@@ -104,7 +104,9 @@ frontend/.env
 
 Navegue até a frontend e crie um arquivo .env para especificar a URL base da API do backend:
 
+```
 VITE_API_BASE_URL=http://localhost:3000
+```
 
 ### 3. Configurar e Iniciar o Banco de Dados (SQL Server com Docker)
 O banco de dados SQL Server é gerenciado pelo Docker Compose para facilitar a configuração e portabilidade.
@@ -116,8 +118,9 @@ cd backend
 Verifique o docker-compose.yml: Confirme se a variável SA_PASSWORD dentro da seção environment do serviço sqlserver no arquivo docker-compose.yml corresponde à DB_PASSWORD que você definiu no arquivo .env do backend.
 
 Inicie o container do SQL Server: Este comando também executará o script para criar o banco de dados todolist_db se ele não existir.
-
+```
 docker-compose up -d
+```
 
 Aguarde alguns instantes para o SQL Server inicializar completamente. Você pode verificar os logs com docker-compose logs -f sqlserver.
 
@@ -131,7 +134,7 @@ Após a instalação das dependências e com o banco de dados Docker rodando, ap
 
 npm run migration:run
 
-Nota: Se esta for a primeira vez configurando as migrations em um banco de dados completamente limpo (e você já tem a configuração data-source.ts e a pasta src/migrations com uma migration inicial, como a InitialSchema), este comando criará a estrutura das tabelas. Se você não gerou uma migration inicial ainda, você precisaria executar npm run migration:generate src/migrations/NomeDaSuaMigrationInicial antes.
+Nota: Se esta for a primeira vez configurando as migrations em um banco de dados completamente limpo (e você já tem a configuração data-source.ts e a pasta src/migrations com uma migration inicial, como a InitialSchema), este comando criará a estrutura das tabelas. Se você não gerou uma migration inicial ainda, você precisaria executar npm run migration:generate src/migrations/[NomeDaSuaMigrationInicial] antes.
 
 ### 5. Instalar Dependências (Frontend)
 
