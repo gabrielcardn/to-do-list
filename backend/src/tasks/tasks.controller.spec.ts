@@ -113,7 +113,7 @@ describe('TasksController', () => {
     const expectedTask = {
       id: taskId,
       title: 'Specific Task',
-      userId: mockUser.id /* ... other fields */,
+      userId: mockUser.id,
     } as Task;
 
     it('should call tasksService.getTaskById and return the task', async () => {
@@ -131,7 +131,7 @@ describe('TasksController', () => {
       id: taskId,
       title: 'Task',
       status: TaskStatus.DONE,
-      userId: mockUser.id /* ... */,
+      userId: mockUser.id,
     } as Task;
 
     it('should call tasksService.updateTaskStatus and return the updated task', async () => {
@@ -156,7 +156,7 @@ describe('TasksController', () => {
     const expectedTask = {
       id: taskId,
       title: 'Updated Title',
-      userId: mockUser.id /* ... */,
+      userId: mockUser.id,
     } as Task;
 
     it('should call tasksService.updateTask and return the updated task', async () => {

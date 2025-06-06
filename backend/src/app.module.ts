@@ -31,7 +31,7 @@ import { TasksModule } from './tasks/tasks.module';
           password: dbPassword,
           database: dbDatabase,
           entities: [__dirname + '/../**/*.entity.js'],
-          synchronize: true,
+          synchronize: false,
           options: {
             encrypt: false,
             trustServerCertificate: true,

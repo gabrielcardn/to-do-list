@@ -44,7 +44,6 @@ function RegistrationPage() {
     <div>
       <h2>Registrar Nova Conta</h2>
       <form onSubmit={handleSubmit}>
-        {/* Campos do formulário (username, password, confirmPassword) - sem alteração */}
         <div>
           <label htmlFor="username">Usuário:</label>
           <input

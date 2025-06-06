@@ -131,7 +131,6 @@ describe("RegistrationPage", () => {
       <MemoryRouter initialEntries={["/login"]}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          {/* Adicione outras rotas que App.tsx define, se necessário para o contexto */}
         </Routes>
       </MemoryRouter>
     );

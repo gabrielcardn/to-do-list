@@ -14,7 +14,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.CREATED) // Enum com as respostas*
   async register(@Body() createUserDto: CreateUserDto): Promise<UserProfile> {
     return this.authService.register(createUserDto);
   }

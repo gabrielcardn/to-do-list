@@ -8,7 +8,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate(); 
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,7 +39,6 @@ function LoginPage() {
     <div>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        {/* ... campos do formulário (username, password) e botão ... (sem alteração) */}
         <div>
           <label htmlFor="username">Usuário:</label>
           <input
@@ -68,7 +67,7 @@ function LoginPage() {
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </form>
       <p>
-        Não tem uma conta? <Link to="/register">Registre-se aqui</Link> {/* <-- Link adicionado */}
+        Não tem uma conta? <Link to="/register">Registre-se aqui</Link> 
       </p>
     </div>
   );
